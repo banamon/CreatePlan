@@ -19,13 +19,13 @@ public class CreateRooms : MonoBehaviour
     {
         residence_positons = GetWorldLinepositons(ResidenceObject);
 
-        //共有スペースの配置
-        GameObject commonspace_obj = Instantiate(Comonspace_Pfb, Vector3.zero, Quaternion.identity);
-        commonspace_obj.transform.SetParent(ResidenceObject.transform, true);
-        commonspace_positons = GetWorldLinepositons(commonspace_obj);
-        Vector3 commonspace_position = (residence_positons[3] + residence_positons[0]) / 2;
-        commonspace_position.x -= (commonspace_positons[3].x - commonspace_positons[0].x) / 2;
-        commonspace_obj.transform.position = commonspace_position;
+        ////共有スペースの配置
+        //GameObject commonspace_obj = Instantiate(Comonspace_Pfb, Vector3.zero, Quaternion.identity);
+        //commonspace_obj.transform.SetParent(ResidenceObject.transform, true);
+        //commonspace_positons = GetWorldLinepositons(commonspace_obj);
+        //Vector3 commonspace_position = (residence_positons[3] + residence_positons[0]) / 2;
+        //commonspace_position.x -= (commonspace_positons[3].x - commonspace_positons[0].x) / 2;
+        //commonspace_obj.transform.position = commonspace_position;
 
 
         Debug.Log(Calc_areasize(residence_positons));
