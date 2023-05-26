@@ -1,0 +1,18 @@
+[
+  {
+    "dxf_entity": "Line"
+  },
+  {
+    "dxf_entity": "Line"
+  },
+  {
+    "dxf_entity": "Line"
+  },
+  {
+    "dxf_entity": "Line"
+  }
+]
+1
+1
+1
+1

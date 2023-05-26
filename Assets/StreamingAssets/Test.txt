@@ -1,0 +1,54 @@
+[
+  {
+    "dxf_entity": "Line",
+    "dxf_startPoint": {
+      "X": 0.0,
+      "Y": 0.0,
+      "IsNormalized": false
+    },
+    "dxf_endPoint": {
+      "X": 10.0,
+      "Y": 0.0,
+      "IsNormalized": false
+    }
+  },
+  {
+    "dxf_entity": "Line",
+    "dxf_startPoint": {
+      "X": 10.0,
+      "Y": 0.0,
+      "IsNormalized": false
+    },
+    "dxf_endPoint": {
+      "X": 10.0,
+      "Y": 30.0,
+      "IsNormalized": false
+    }
+  },
+  {
+    "dxf_entity": "Line",
+    "dxf_startPoint": {
+      "X": 10.0,
+      "Y": 30.0,
+      "IsNormalized": false
+    },
+    "dxf_endPoint": {
+      "X": 0.0,
+      "Y": 30.0,
+      "IsNormalized": false
+    }
+  },
+  {
+    "dxf_entity": "Line",
+    "dxf_startPoint": {
+      "X": 0.0,
+      "Y": 30.0,
+      "IsNormalized": false
+    },
+    "dxf_endPoint": {
+      "X": 0.0,
+      "Y": 0.0,
+      "IsNormalized": false
+    }
+  }
+]
