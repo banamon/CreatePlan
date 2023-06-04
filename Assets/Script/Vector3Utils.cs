@@ -13,15 +13,15 @@ namespace Assets.Script {
         /// </summary>
         /// <param name="positons"></param>
         /// <returns></returns>
-        public static float Calc_areasize(Vector3[] pos) {
-            float area = 0;
+        public static long Calc_areasize(Vector3[] pos) {
+            long area = 0;
             for (int i = 0; i < pos.Length; i++) {
                 if (i == pos.Length - 1) {
 
-                    area += (pos[i].x * pos[0].y - pos[i].y * pos[0].x) / 2;
+                    area += (long)(pos[i].x * pos[0].y - pos[i].y * pos[0].x) / 2;
                 }
                 else {
-                    area += (pos[i].x * pos[i + 1].y - pos[i].y * pos[i + 1].x) / 2;
+                    area += (long)(pos[i].x * pos[i + 1].y - pos[i].y * pos[i + 1].x) / 2;
 
                 }
             }

@@ -13,59 +13,132 @@ public class PutRes : MonoBehaviour
     [SerializeField]GameObject ResPreafb;
 
     // 建蔽率：Building Coverage Ratio
-    float BCR = 0.8f;
+    float BCR = 0.2f;
 
     bool calcres = false;
 
     Vector3[] landrormvec;
-    int landformarea;
-    int targetArea;
+    /// <summary>
+    /// 地型面積
+    /// </summary>
+    long landformarea;
+    long targetArea;
 
-    int LineX;
+    long LineX;
     bool calcareafirst = false;
     bool areaflag = false;
-    int count_areacalc = 0;
+    long count_areacalc = 0;
 
     // Start is called before the first frame update
     void Start()
     {
         //座標取得
         landrormvec = Vector3Utils.GetWorldLinepositons(landform);
-        landformarea = (int)Vector3Utils.Calc_areasize(landrormvec);
-        targetArea = (int) (landformarea * BCR);
+        landformarea = (long)Vector3Utils.Calc_areasize(landrormvec);
+        targetArea = (long) (landformarea * BCR);
 
-        float x1 = landrormvec[0].x;
-        float x2 = landrormvec[1].x;
-        float y1 = landrormvec[0].y;
-        float y2 = landrormvec[1].y;
-        LineX = (int)(targetArea / Math.Sqrt((Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2))));
-        Debug.Log("地型面積：" + landformarea + " 目標面積：" + targetArea + "fist LineX" + LineX);
-        count_areacalc = 0;
-        calcareafirst = true;
-        calcres = true;
+        long x1 = (long)landrormvec[0].x;
+        long x2 = (long)landrormvec[1].x;
+        long y1 = (long)landrormvec[0].y;
+        long y2 = (long)landrormvec[1].y;
+
+
+        //地型のxの範囲の取得
+        int min_x = 0;
+        int max_x = 0;
+        for (int i = 0; i < landrormvec.Length; i++) {
+            if (max_x < landrormvec[i].x) {
+                max_x = (int) landrormvec[i].x;
+            }
+        }
+
+
+        //2文探査のため，Xの範囲の中央値を初期値として入れる
+        Debug.Log(
+            "地型面積：" + landformarea + 
+            " 目標面積：" + targetArea + 
+            " 座標範囲(" + min_x + " ～ " + max_x
+        );
+
+
+        int LineX = SearchX(min_x, max_x, landrormvec, targetArea, targetArea);
+        Vector3[] AreaVec = Getintersection(landrormvec, LineX);
+        Vector3Utils.DrowLine(AreaVec, Vector3.zero, ResPreafb);
     }
+
+    int SearchX(int min_x, int max_x , Vector3[] landrormvec, long targetArea, long min_diff) {
+        int count = 0;
+        int closet_LineX = 0;
+
+        while (min_x <= max_x) {
+            Debug.Log(min_x + "～" + min_x + " " + min_diff); 
+            //中間地の取得
+            int tempLineX = (int)((min_x + max_x) / 2);
+            Vector3[] tempres = Getintersection(landrormvec, tempLineX + 1);
+            int temparea = (int)Vector3Utils.Calc_areasize(tempres);
+
+            //中央値の左右の値と比較(tempLineXと範囲の確認が必要）
+            //右側
+            Vector3[] tempres_right = Getintersection(landrormvec, tempLineX + 1);
+            long temparea_right = (int)Vector3Utils.Calc_areasize(tempres_right);
+            long min_diff_right = Math.Abs(targetArea - temparea_right);
+            //左側
+            Vector3[] tempres_left = Getintersection(landrormvec, tempLineX - 1);
+            long temparea_left = (int)Vector3Utils.Calc_areasize(tempres_left);
+            long min_diff_left = Math.Abs(targetArea - temparea_left);
+
+
+            //最小値の更新
+            if (min_diff > min_diff_right) {
+                min_diff = min_diff_right;
+                closet_LineX = tempLineX + 1;
+            }
+            else if (min_diff > min_diff_left) { 
+                min_diff = min_diff_left;
+                closet_LineX = tempLineX - 1;
+            }
+
+            //探索範囲の狭める（2文探索）
+            if (temparea < targetArea) {
+                min_x = tempLineX + 1;
+            }else if (temparea > targetArea) {
+                max_x = tempLineX - 1;
+            }
+            else {
+                return closet_LineX;
+            }
+            count++;
+        }
+
+        Debug.Log("計算階数" + count + "回 closet_LineX:" + closet_LineX);
+        return closet_LineX;
+    }
+
+
+
+
 
     // Update is called once per frame
     void Update()
     {
-        if (calcres) {
-            Vector3[] tempres = Getintersection(landrormvec, LineX);
-            int temparea = (int) Vector3Utils.Calc_areasize(tempres);
-            LineX = (temparea > targetArea) ? LineX - 1: LineX + 1;
+        //if (calcres) {
+        //    Vector3[] tempres = Getintersection(landrormvec, LineX);
+        //    int temparea = (int) Vector3Utils.Calc_areasize(tempres);
+        //    LineX = (temparea > targetArea) ? LineX - 1: LineX + 1;
 
-            if (calcareafirst) {
-                areaflag = (temparea > targetArea);
-                calcareafirst = false;
-                return;
-            }
+        //    if (calcareafirst) {
+        //        areaflag = (temparea > targetArea);
+        //        calcareafirst = false;
+        //        return;
+        //    }
 
-            count_areacalc++;
-            if (areaflag != (temparea > targetArea)) {
-                Debug.Log("Finish 目標:" + targetArea + " 実際:" + temparea + "計算回数" + count_areacalc );
-                Vector3Utils.DrowLine(tempres, Vector3.zero, ResPreafb);
-                calcres = false;
-            }
-        }    
+        //    count_areacalc++;
+        //    if (areaflag != (temparea > targetArea)) {
+        //        Debug.Log("Finish 目標:" + targetArea + " 実際:" + temparea + "計算回数" + count_areacalc );
+        //        Vector3Utils.DrowLine(tempres, Vector3.zero, ResPreafb);
+        //        calcres = false;
+        //    }
+        //}    
     }
 
     /// <summary>
