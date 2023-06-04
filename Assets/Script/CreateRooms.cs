@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Assets.Script;
 
 public class CreateRooms : MonoBehaviour
 {
@@ -18,68 +19,89 @@ public class CreateRooms : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        residence_positons = GetWorldLinepositons(ResidenceObject);
+        residence_positons = Vector3Utils.GetWorldLinepositons(ResidenceObject);
 
         ////共有スペースの配置
         GameObject commonspace_obj = Instantiate(Comonspace_Pfb, Vector3.zero, Quaternion.identity);
         commonspace_obj.transform.SetParent(ResidenceObject.transform, true);
-        commonspace_positons = GetWorldLinepositons(commonspace_obj);
+        commonspace_positons = Vector3Utils.GetWorldLinepositons(commonspace_obj);
         Vector3 commonspace_position = (residence_positons[3] + residence_positons[0]) / 2;
         commonspace_position.x -= (commonspace_positons[3].x - commonspace_positons[0].x) / 2;
         commonspace_obj.transform.position = commonspace_position;
-        commonspace_positons = GetWorldLinepositons(commonspace_obj);
+        commonspace_positons = Vector3Utils.GetWorldLinepositons(commonspace_obj);
 
 
-        Debug.Log(Calc_areasize(residence_positons));
-        Debug.Log(Calc_areasize(commonspace_positons));
+        Debug.Log(Vector3Utils.Calc_areasize(residence_positons));
+        Debug.Log(Vector3Utils.Calc_areasize(residence_positons));
         Split_2(residence_positons, commonspace_positons);
+
+        Vector3[] overVec =  GetLine_Overlap_Residence_Commonspace(residence_positons, commonspace_positons);
+        Vector3Utils.DrowLine(overVec,Vector3.zero,Room_Pfb);
     }
 
-    /// <summary>
-    /// ワールド座標の図形座標集合の取得
-    /// </summary>
-    /// <param name="fig">取得したいGameObject</param>
-    /// <returns>ワールド座標集合</returns>
-    Vector3[] GetWorldLinepositons(GameObject fig_obj) {
-        LineRenderer fig_linerender = fig_obj.GetComponent<LineRenderer>();
-        Vector3[] fig_positons = new Vector3[fig_linerender.positionCount];
-        Vector3[] fig_positons_world = new Vector3[fig_linerender.positionCount];
-        fig_linerender.GetPositions(fig_positons);
 
-        Debug.Log("ワールド座標" + fig_obj.transform.position);
 
-        for (int i = 0; i < fig_positons_world.Length; i++) {
-            fig_positons_world[i] = fig_positons[i] + fig_obj.transform.position;
-        }
-        return fig_positons_world;
-    }
 
-    /// <summary>
-    /// 図形の面積計算
-    /// </summary>
-    /// <param name="positons"></param>
-    /// <returns></returns>
-    float Calc_areasize(Vector3[] pos) {
-        float area = 0;
-        for (int i = 0; i< pos.Length;i++) {
-            if (i == pos.Length - 1) {
-
-            area += (pos[i].x * pos[0].y - pos[i].y * pos[0].x) / 2;
-            }
-            else {
-            area += (pos[i].x * pos[i + 1].y - pos[i].y * pos[i + 1].x) / 2;
-
-            }
-        }
-        return Math.Abs(area);
-    }
 
     /// <summary>
     /// 【実装中】
     /// 共有スペースの配置後に，居住スペースと共有スペースが重なった座標集合を取得すれば，分割計算が楽な気がする
     /// </summary>
-    void GetLine_Overlap_Residence_Commonspace(Vector3[] respos, Vector3[] comonpos) {
+    Vector3[] GetLine_Overlap_Residence_Commonspace(Vector3[] respos, Vector3[] comonpos) {
+        Vector3[] overlapvec = new Vector3[respos.Length + comonpos.Length];
 
+        int line_start_index = 0;
+        //階段室と建物部分が接している辺の特定
+        for (int i = 0; i<respos.Length;i++) {
+            Vector3 start = respos[i];
+            Vector3 end = (i+1 == respos.Length) ? respos[0]: respos[i+1];
+            
+            if (JudgePointLine(start, end, comonpos[0])) {
+                line_start_index = i;
+                break;
+            }
+        }
+
+        Debug.Log("StartPointIndex" + line_start_index);
+        Debug.Log(" overlapvec.Length" + overlapvec.Length);
+
+        //座標合成
+        int comonpos_reversindex = 0;
+        for (int i = 0; i < overlapvec.Length; i++) {
+            if (i > line_start_index && comonpos_reversindex <= comonpos.Length - 1) {
+                Debug.Log("overlap[" + i + "] = compos[" + (comonpos.Length - 1 - comonpos_reversindex) + "]");
+                overlapvec[i] = comonpos[comonpos.Length-1 - comonpos_reversindex++];
+                Debug.Log("合成中" + i + ":" + overlapvec[i] + " " + comonpos_reversindex);
+            }else{
+                Debug.Log("overlap[" + i + "] = respos[" + (i - comonpos_reversindex) + "]");
+                overlapvec[i] = respos[i - comonpos_reversindex];
+                Debug.Log("入力中" + i + ":" + overlapvec[i - comonpos_reversindex]);
+            }
+        }
+
+        return overlapvec;
+    }
+
+
+    /// <summary>
+    /// 点が線分上かどうかの判定
+    /// 点Pが線分AB上にあるか
+    /// </summary>
+    /// <param name="A"></param>
+    /// <param name="B"></param>
+    /// <param name="P"></param>
+    /// <returns></returns>
+    bool JudgePointLine(Vector3 A, Vector3 B, Vector3 P) {
+        bool flag = false;
+        if ((A.x <= P.x && P.x <= B.x) || (B.x <= P.x && P.x <= A.x)) {
+            if ((A.y <= P.y && P.y <= B.y) || (B.y <= P.y && P.y <= A.y)) {
+                if ((P.y * (A.x - B.x)) + (A.y * (B.x - P.x)) + (B.y * (P.x - A.x)) == 0) {
+                    // 点Pが線分AB上にある
+                    flag = true;
+                }
+            }
+        }
+        return flag;
     }
 
     /// <summary>
@@ -97,18 +119,6 @@ public class CreateRooms : MonoBehaviour
         for (int i = 0; i< comonpos.Length;i++) {
             Debug.Log(comonpos[i]);
         }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -157,7 +167,7 @@ public class CreateRooms : MonoBehaviour
         }
         residence_1[residence_1_index++] = comonpos[0];
         residence_1[residence_1_index++] = comonpos[1];
-        createbox(residence_1, Vector3.zero);
+        Vector3Utils.DrowLine(residence_1, Vector3.zero,Room_Pfb);
 
         //2つ目の図形
         int residence_2_index = 0;
@@ -168,39 +178,23 @@ public class CreateRooms : MonoBehaviour
         }
         residence_2[residence_2_index++] = comonpos[3];
         residence_2[residence_2_index++] = comonpos[2];
-        createbox(residence_2, Vector3.zero);
+        Vector3Utils.DrowLine(residence_2, Vector3.zero, Room_Pfb);
 
     }
+
 
     /// <summary>
-    /// 座標集合を渡すとオブジェクトを描写
+    /// 住戸空間をｎ分割
+    /// 返り値はn個の座標配列（オブジェクトでもいいかも）を持つオブジェクト
     /// </summary>
-    /// <param name="boxpos"></param>
-    void createbox(Vector3[] boxlinepos,Vector3 boxpos) {
-        /*
-         * 
-         * boxlineposはローカル座標で，原点0にすべきなのか？？
-         * 
-         */
+    /// <param name="respos">建物部分座標集合</param>
+    /// <param name="n">分割住戸数</param>
+    void SplitRes(Vector3[] respos, int n) {
 
-        GameObject newRoom = Instantiate(Room_Pfb, boxpos, Quaternion.identity);
-
-        // LineRendererコンポーネントをゲームオブジェクトにアタッチする
-        var lineRenderer = newRoom.GetComponent<LineRenderer>();
-
-        var positions = new Vector3[boxlinepos.Length];
-        for (int i = 0; i < boxlinepos.Length; i++) {
-            positions[i] = boxlinepos[i];
-            //positions[i] = boxlinepos[i] - boxlinepos[0];
-        }
-        
-
-        // 点の数を指定する
-        lineRenderer.positionCount = positions.Length;
-        lineRenderer.loop = true;
-        lineRenderer.useWorldSpace = false;     // ローカル座標
-
-        // 線を引く場所を指定する
-        lineRenderer.SetPositions(positions);
     }
+
+
+
+
+
 }
