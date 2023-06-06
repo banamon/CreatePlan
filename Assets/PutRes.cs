@@ -37,12 +37,6 @@ public class PutRes : MonoBehaviour
         landformarea = (long)Vector3Utils.Calc_areasize(landrormvec);
         targetArea = (long) (landformarea * BCR);
 
-        long x1 = (long)landrormvec[0].x;
-        long x2 = (long)landrormvec[1].x;
-        long y1 = (long)landrormvec[0].y;
-        long y2 = (long)landrormvec[1].y;
-
-
         //’nŒ^‚Ìx‚Ì”ÍˆÍ‚Ìæ“¾
         int min_x = 0;
         int max_x = 0;
@@ -66,6 +60,16 @@ public class PutRes : MonoBehaviour
         Vector3Utils.DrowLine(AreaVec, Vector3.zero, ResPreafb);
     }
 
+
+    /// <summary>
+    /// –Ú•W–ÊÏ‚ğ‚Æ‚ê‚éxÀ•W‚ğ2•ª’Tõ‚ÅŒ©‚Â‚¯‚é
+    /// </summary>
+    /// <param name="min_x"></param>
+    /// <param name="max_x"></param>
+    /// <param name="landrormvec"></param>
+    /// <param name="targetArea"></param>
+    /// <param name="min_diff"></param>
+    /// <returns></returns>
     int SearchX(int min_x, int max_x , Vector3[] landrormvec, long targetArea, long min_diff) {
         int count = 0;
         int closet_LineX = 0;
@@ -112,33 +116,6 @@ public class PutRes : MonoBehaviour
 
         Debug.Log("ŒvZŠK”" + count + "‰ñ closet_LineX:" + closet_LineX);
         return closet_LineX;
-    }
-
-
-
-
-
-    // Update is called once per frame
-    void Update()
-    {
-        //if (calcres) {
-        //    Vector3[] tempres = Getintersection(landrormvec, LineX);
-        //    int temparea = (int) Vector3Utils.Calc_areasize(tempres);
-        //    LineX = (temparea > targetArea) ? LineX - 1: LineX + 1;
-
-        //    if (calcareafirst) {
-        //        areaflag = (temparea > targetArea);
-        //        calcareafirst = false;
-        //        return;
-        //    }
-
-        //    count_areacalc++;
-        //    if (areaflag != (temparea > targetArea)) {
-        //        Debug.Log("Finish –Ú•W:" + targetArea + " ÀÛ:" + temparea + "ŒvZ‰ñ”" + count_areacalc );
-        //        Vector3Utils.DrowLine(tempres, Vector3.zero, ResPreafb);
-        //        calcres = false;
-        //    }
-        //}    
     }
 
     /// <summary>
