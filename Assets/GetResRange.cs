@@ -9,7 +9,8 @@ public class GetResRange : MonoBehaviour
     [SerializeField] GameObject landform;
     [SerializeField] GameObject ResPreafb;
 
-    int Distanceboundary = 610;
+    int Distanceboundary = 10;
+    //int Distanceboundary = 610;
     Vector3[] landrormvec;
 
 
@@ -17,52 +18,67 @@ public class GetResRange : MonoBehaviour
     void Start()
     {
         landrormvec = Vector3Utils.GetWorldLinepositons(landform);
+
+        int[] distances = new int[landrormvec.Length];
+        for (int i = 0; i < landrormvec.Length; i++) {
+            distances[i] = (i % 2 == 0) ? 5 : 10;
+            //distances[i] = i * 2 + 5;
+            Debug.Log(distances[i]);
+        }
+
+        Vector3Utils.DrowLine(GetPossibleArea(landrormvec,distances), Vector3.zero, ResPreafb);
+    }
+
+
+    public Vector3[] GetPossibleArea(Vector3[] landvecs, int[] distances) {
         Vector3[] possiblerange_vecs = new Vector3[landrormvec.Length];
 
-
-        for (int i = 0;i < possiblerange_vecs.Length; i++) {
-            Vector3 A = (i-1 >= 0) ? landrormvec[i - 1] : landrormvec[landrormvec.Length - 1];
+        for (int i = 0; i < possiblerange_vecs.Length; i++) {
+            //入力の取得
+            Vector3 A = (i - 1 >= 0) ? landrormvec[i - 1] : landrormvec[landrormvec.Length - 1];
             Vector3 B = landrormvec[i];
             Vector3 C = (i + 1 < landrormvec.Length) ? landrormvec[i + 1] : landrormvec[0];
-            
-            // 距離Xを指定します
-            int distanceX = Distanceboundary;
-            Vector3 P = CalculatePointP(A, B, C, distanceX);
-            possiblerange_vecs[i] = P;
+            int distanceX = distances[i];
+            int distanceY = (i - 1 >= 0) ? distances[i - 1] : distances[distances.Length - 1];
 
-            Debug.Log("目標：" + distanceX + " " + CalculateDistance(A,B,P) + " " + CalculateDistance(B, C, P));
+            // 点P取得
+            possiblerange_vecs[i] = CalculatePointP(A, B, C, distanceX, distanceY);
+            Debug.Log("目標：" + distanceX + "/" + distanceY + " " + CalculateDistance(A, B, P) + "/" + CalculateDistance(B, C, P));
         }
-        Vector3Utils.DrowLine(possiblerange_vecs, Vector3.zero, ResPreafb);
+
+        return possiblerange_vecs;
     }
 
     /// <summary>
-    /// 全ての境界線から一定距離離れた座標集合の取得
+    /// 辺ABからdistanceY，辺BCからdistanceXの距離をとる内側の座標集合の取得
     /// </summary>
     /// <param name="A"></param>
     /// <param name="B"></param>
     /// <param name="C"></param>
-    /// <param name="distance"></param>
+    /// <param name="distanceY"></param>
+    /// <param name="distanceX"></param>
     /// <returns></returns>
-    Vector3 CalculatePointP(Vector3 A,Vector3 B, Vector3 C, int distance) {
-        Debug.LogWarning("=="+A + " " + B + " " + C + "==");
+    public Vector3 CalculatePointP(Vector3 A, Vector3 B, Vector3 C, int distanceY, int distanceX) {
+        Debug.LogWarning("==" + A + " " + B + " " + C + " X:" + distanceX + " Y:" + distanceY + "==");;
 
-        // ベクトルBCの取得
-        Vector3 vectorBC = C - B;
+        // BA,BCの単位ベクトル取得
+        Vector3 normalizedBA = (A - B).normalized;
+        Vector3 normalizedBC = (C - B).normalized;
 
-        //内心Iとその単位ベクトルの取得
-        Vector3 vectorBI = Get_innercenter(A, B, C) - B;
-        Vector3 normalizedBI = vectorBI.normalized;
+        float distanceA1 = normalizedBA.magnitude;
+        float distanceB1 = ((float)distanceY / (float)distanceX) * distanceA1;
 
-        //ベクトルBPの長さを求める
-        Vector3 normalizedBC = vectorBC.normalized;
+        Vector2 normalizedBI = (distanceA1 * normalizedBA + distanceB1 * normalizedBC).normalized;
         float sin = (-1 * normalizedBC.y * normalizedBI.x + normalizedBC.x * normalizedBI.y);
-        float distance_I = distance / sin;
-
+        float distance_I = distanceX / sin;
 
         Vector3 vectorBP = distance_I * normalizedBI;
 
         return vectorBP + B;
     }
+
+
+
 
     public Vector3 Get_innercenter(Vector3 A, Vector3 B, Vector3 C) {
 
