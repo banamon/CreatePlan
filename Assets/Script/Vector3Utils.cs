@@ -52,7 +52,7 @@ namespace Assets.Script {
         /// 座標集合を渡すとオブジェクトを描写
         /// </summary>
         /// <param name="boxpos"></param>
-        public static void DrowLine(Vector3[] boxlinepos, Vector3 boxpos, GameObject Preafb) {
+        public static GameObject DrowLine(Vector3[] boxlinepos, Vector3 boxpos, GameObject Preafb) {
             /*
              * 
              * boxlineposはローカル座標で，原点0にすべきなのか？？
@@ -78,6 +78,8 @@ namespace Assets.Script {
 
             // 線を引く場所を指定する
             lineRenderer.SetPositions(positions);
+
+            return newRoom;
         }
     }
 }

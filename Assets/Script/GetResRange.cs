@@ -17,6 +17,7 @@ public class GetResRange : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Debug.Log("start");
         landrormvec = Vector3Utils.GetWorldLinepositons(landform);
 
         int[] distances = new int[landrormvec.Length];
@@ -31,19 +32,21 @@ public class GetResRange : MonoBehaviour
 
 
     public Vector3[] GetPossibleArea(Vector3[] landvecs, int[] distances) {
-        Vector3[] possiblerange_vecs = new Vector3[landrormvec.Length];
+        Vector3[] possiblerange_vecs = new Vector3[landvecs.Length];
 
         for (int i = 0; i < possiblerange_vecs.Length; i++) {
             //入力の取得
-            Vector3 A = (i - 1 >= 0) ? landrormvec[i - 1] : landrormvec[landrormvec.Length - 1];
-            Vector3 B = landrormvec[i];
-            Vector3 C = (i + 1 < landrormvec.Length) ? landrormvec[i + 1] : landrormvec[0];
-            int distanceX = distances[i];
-            int distanceY = (i - 1 >= 0) ? distances[i - 1] : distances[distances.Length - 1];
+            Vector3 A = (i - 1 >= 0) ? landvecs[i - 1] : landvecs[landvecs.Length - 1];
+            Vector3 B = landvecs[i];
+            Vector3 C = (i + 1 < landvecs.Length) ? landvecs[i + 1] : landvecs[0];
+            int distanceY = distances[i];
+            int distanceX = (i - 1 >= 0) ? distances[i - 1] : distances[distances.Length - 1];
 
             // 点P取得
-            possiblerange_vecs[i] = CalculatePointP(A, B, C, distanceX, distanceY);
-            Debug.Log("目標：" + distanceX + "/" + distanceY + " " + CalculateDistance(A, B, P) + "/" + CalculateDistance(B, C, P));
+            Vector3 P = CalculatePointP(A, B, C, distanceX, distanceY);
+            possiblerange_vecs[i] = P;
+
+            //Debug.Log("目標：" + distanceX + "/" + distanceY + " " + CalculateDistance(A, B, P) + "/" + CalculateDistance(B, C, P));
         }
 
         return possiblerange_vecs;

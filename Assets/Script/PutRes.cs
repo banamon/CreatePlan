@@ -37,28 +37,47 @@ public class PutRes : MonoBehaviour
         landformarea = (long)Vector3Utils.Calc_areasize(landrormvec);
         targetArea = (long) (landformarea * BCR);
 
-        //’nŒ^‚Ìx‚Ì”ÍˆÍ‚ÌŽæ“¾
+        ////’nŒ^‚Ìx‚Ì”ÍˆÍ‚ÌŽæ“¾
+        //int min_x = 0;
+        //int max_x = 0;
+        //for (int i = 0; i < landrormvec.Length; i++) {
+        //    if (max_x < landrormvec[i].x) {
+        //        max_x = (int) landrormvec[i].x;
+        //    }
+        //}
+
+
+        ////2•¶’T¸‚Ì‚½‚ßCX‚Ì”ÍˆÍ‚Ì’†‰›’l‚ð‰Šú’l‚Æ‚µ‚Ä“ü‚ê‚é
+        //Debug.Log(
+        //    "’nŒ^–ÊÏF" + landformarea + 
+        //    " –Ú•W–ÊÏF" + targetArea + 
+        //    " À•W”ÍˆÍ(" + min_x + " ` " + max_x
+        //);
+
+
+        //int LineX = SearchX(min_x, max_x, landrormvec, targetArea);
+        //Vector3[] AreaVec = Getintersection(landrormvec, LineX);
+        Vector3Utils.DrowLine(GetResArea(landrormvec,targetArea), Vector3.zero, ResPreafb);
+    }
+
+
+    public Vector3[] GetResArea(Vector3[] landrormvec, long targetArea) {
         int min_x = 0;
         int max_x = 0;
         for (int i = 0; i < landrormvec.Length; i++) {
             if (max_x < landrormvec[i].x) {
-                max_x = (int) landrormvec[i].x;
+                max_x = (int)landrormvec[i].x;
             }
         }
-
-
-        //2•¶’T¸‚Ì‚½‚ßCX‚Ì”ÍˆÍ‚Ì’†‰›’l‚ð‰Šú’l‚Æ‚µ‚Ä“ü‚ê‚é
-        Debug.Log(
-            "’nŒ^–ÊÏF" + landformarea + 
-            " –Ú•W–ÊÏF" + targetArea + 
-            " À•W”ÍˆÍ(" + min_x + " ` " + max_x
-        );
-
-
-        int LineX = SearchX(min_x, max_x, landrormvec, targetArea, targetArea);
+        int LineX = SearchX(min_x, max_x, landrormvec, targetArea);
         Vector3[] AreaVec = Getintersection(landrormvec, LineX);
-        Vector3Utils.DrowLine(AreaVec, Vector3.zero, ResPreafb);
+        
+        return AreaVec;
     }
+
+
+
+
 
 
     /// <summary>
@@ -70,9 +89,11 @@ public class PutRes : MonoBehaviour
     /// <param name="targetArea"></param>
     /// <param name="min_diff"></param>
     /// <returns></returns>
-    int SearchX(int min_x, int max_x , Vector3[] landrormvec, long targetArea, long min_diff) {
+    int SearchX(int min_x, int max_x , Vector3[] landrormvec, long targetArea) {
         int count = 0;
         int closet_LineX = 0;
+
+        long min_diff = max_x;
 
         while (min_x <= max_x) {
             Debug.Log(min_x + "`" + min_x + " " + min_diff); 
