@@ -6,6 +6,7 @@ using System;
 
 /// <summary>
 /// 建物配置
+/// 2分探索で建物配置可能範囲を特定する
 /// </summary>
 public class PutRes : MonoBehaviour
 {
@@ -158,6 +159,7 @@ public class PutRes : MonoBehaviour
                 resposlist.Add(start);
             }
             if ((start.x < x && x < end.x)||(start.x > x && x > end.x)) {
+                // 
                 float y = (end.y - start.y) / (end.x - start.x) * (x - end.x) + end.y;
                 Vector3 intersection = new Vector3(x, y, 0);
                 resposlist.Add(intersection);

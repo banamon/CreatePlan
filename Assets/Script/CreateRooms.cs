@@ -44,7 +44,6 @@ public class CreateRooms : MonoBehaviour
 
 
     /// <summary>
-    /// 【実装中】
     /// 共有スペースの配置後に，居住スペースと共有スペースが重なった座標集合を取得すれば，分割計算が楽な気がする
     /// </summary>
     Vector3[] GetLine_Overlap_Residence_Commonspace(Vector3[] respos, Vector3[] comonpos) {

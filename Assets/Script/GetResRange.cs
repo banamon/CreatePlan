@@ -69,14 +69,23 @@ public class GetResRange : MonoBehaviour
         Vector3 normalizedBC = (C - B).normalized;
 
         float distanceA1 = normalizedBA.magnitude;
-        float distanceB1 = ((float)distanceY / (float)distanceX) * distanceA1;
+        float distanceC1 = ((float)distanceY / (float)distanceX) * distanceA1;
 
-        Vector2 normalizedBI = (distanceA1 * normalizedBA + distanceB1 * normalizedBC).normalized;
+        if (distanceY * distanceX == 0) {
+            distanceA1 = (distanceY == 0) ? normalizedBA.magnitude : 0;
+            distanceC1 = (distanceY == 0) ? 0 : normalizedBC.magnitude;
+        }
+
+
+        Vector2 normalizedBI = (distanceA1 * normalizedBA + distanceC1 * normalizedBC).normalized;
         float sin = (-1 * normalizedBC.y * normalizedBI.x + normalizedBC.x * normalizedBI.y);
         float distance_I = distanceX / sin;
+        if (distanceX == 0) {
+            sin = (-1 * normalizedBA.y * normalizedBI.x + normalizedBA.x * normalizedBI.y);
+            distance_I = distanceY / (-1 * sin);
+        }
 
         Vector3 vectorBP = distance_I * normalizedBI;
-
         return vectorBP + B;
     }
 
@@ -89,8 +98,6 @@ public class GetResRange : MonoBehaviour
         float b = Vector3.Distance(A, C);
         float a = Vector3.Distance(B, C);
         var v = ((a * A + b * B + c * C) / (a + b + c));
-        //Vector3Int innercenter = Vector3Int.RoundToInt(v);
-
         return v;
     }
 
@@ -113,6 +120,7 @@ public class GetResRange : MonoBehaviour
         return Math.Abs(perpendicularLength);
     }
 
+    //
     public static float Vector2Cross(Vector2 lhs, Vector2 rhs) {
         return lhs.x * rhs.y - rhs.x * lhs.y;
     }

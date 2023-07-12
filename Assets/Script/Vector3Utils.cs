@@ -39,7 +39,7 @@ namespace Assets.Script {
             Vector3[] fig_positons_world = new Vector3[fig_linerender.positionCount];
             fig_linerender.GetPositions(fig_positons);
 
-            Debug.Log("ワールド座標" + fig_obj.transform.position);
+            //Debug.Log("ワールド座標" + fig_obj.transform.position);
 
             for (int i = 0; i < fig_positons_world.Length; i++) {
                 fig_positons_world[i] = fig_positons[i] + fig_obj.transform.position;
@@ -63,6 +63,43 @@ namespace Assets.Script {
 
             // LineRendererコンポーネントをゲームオブジェクトにアタッチする
             var lineRenderer = newRoom.GetComponent<LineRenderer>();
+
+            var positions = new Vector3[boxlinepos.Length];
+            for (int i = 0; i < boxlinepos.Length; i++) {
+                positions[i] = boxlinepos[i];
+                //positions[i] = boxlinepos[i] - boxlinepos[0];
+            }
+
+
+            // 点の数を指定する
+            lineRenderer.positionCount = positions.Length;
+            lineRenderer.loop = true;
+            lineRenderer.useWorldSpace = false;     // ローカル座標
+
+            // 線を引く場所を指定する
+            lineRenderer.SetPositions(positions);
+
+            return newRoom;
+        }
+
+        /// <summary>
+        /// 座標集合を渡すとオブジェクトを描写
+        /// </summary>
+        /// <param name="boxpos"></param>
+        public static GameObject DrowLine(Vector3[] boxlinepos, Vector3 boxpos,string boxname) {
+            /*
+             * 
+             * boxlineposはローカル座標で，原点0にすべきなのか？？
+             * 
+             */
+
+            //GameObject newRoom = Instantiate(Preafb, boxpos, Quaternion.identity);
+            GameObject newRoom = new GameObject();
+            newRoom.transform.position = boxpos;
+            newRoom.name = boxname;
+
+            // LineRendererコンポーネントをゲームオブジェクトにアタッチする
+            var lineRenderer = newRoom.AddComponent< LineRenderer>();
 
             var positions = new Vector3[boxlinepos.Length];
             for (int i = 0; i < boxlinepos.Length; i++) {
